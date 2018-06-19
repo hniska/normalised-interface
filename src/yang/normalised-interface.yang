@@ -1,0 +1,84 @@
+module normalised-interface {
+
+  yang-version 1.1;
+
+  namespace "http://tail-f.com/normalised-interface";
+  prefix norm-intf;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  description
+    "example python data provider that reads interface oper data and presents a normalised view if them";
+
+  revision 2016-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  grouping normalised-interfaces {
+    container interfaces {
+        config false;
+        tailf:callpoint getinterface;
+        list interface {
+          key "type name";
+
+          leaf type {
+            type string;
+          }
+
+          leaf name {
+            type string;
+          }
+
+          leaf ip-address {
+            type string;
+          }
+
+          leaf phys-address {
+            type string;
+          }
+
+          leaf admin-status {
+            type string;
+          }
+
+          leaf oper-status {
+            type string;
+          }
+          leaf if-index {
+            type int32 {
+              range "1..2147483647";
+            }
+          }
+          leaf speed {
+              type string;
+          }
+
+        }
+
+      }
+  }
+
+  augment /ncs:devices/ncs:device {
+    container interface-actions {
+      action get-interfaces-info {
+        tailf:actionpoint get-interfaces-info;
+        output {
+          uses normalised-interfaces;
+        }
+      }
+    }
+  }
+
+  augment /ncs:devices/ncs:device {
+    uses normalised-interfaces;
+  }
+}

@@ -1,0 +1,65 @@
+[global target_dir=../../../ncs]
+
+[shell ncs]
+    [timeout 240]
+    [progress \nStop NSO\n]
+    !make stop
+    !echo ==$$?==
+    #?==0==
+    ?SH-PROMPT:
+    [progress \nBuild NSO\n]
+    !make build
+    !echo ==$$?==
+    ?==0==
+    ?SH-PROMPT:
+    [progress \nStart NSO\n]
+    #!cd ${target_dir}
+    !make start
+    ?SH-PROMPT:
+    !echo return value ==$$?==
+    ?==0==
+    ?SH-PROMPT:
+    [progress \nStart NSO...ok\n]
+
+[shell ncs-cli]
+    [progress \nsync-from\n]
+    !cd ${target_dir}
+    !ncs_cli -u admin
+    ?.*>
+    !request devices sync-from
+    ?.result true
+    ?.*>
+
+[shell ncs-cli]
+    [timeout 10]
+
+    [progress \nrun request live-status exec show ip interfaces brief\n]
+    !request devices device c0 live-status exec show args ip interface brief
+    ?jonas#
+    ?.*>
+    [progress \nrun request live-status exec show ip interfaces brief...ok\n]
+
+    [progress \nshow devices device c0 interfaces interface\n]
+    !show devices device c0 interfaces interface
+    ?FastEthernet
+    ?.*>
+    [progress \nshow devices device c0 interfaces interface...ok\n]
+
+    [progress \nshow devices device c0 interfaces interface FastEthernet 0\n]
+    !show devices device c0 interfaces interface FastEthernet 0
+    ?FastEthernet
+    ?.*>
+    [progress \nshow devices device c0 interfaces interface FastEthernet 0...ok\n]
+
+    [progress \nrequest devices device c0 interface-actions get-interfaces-info\n]
+    !request devices device c0 interface-actions get-interfaces-info
+    ?.*type FastEthernet
+    ?.*>
+    [progress \nrequest devices device c0 interface-actions get-interfaces-info...ok\n]
+
+[cleanup]
+    !cd ${target_dir}
+    !make stop
+    !echo ==$$?==
+    ?==0==
+    ?SH-PROMPT:
