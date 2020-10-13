@@ -4,7 +4,7 @@ Example of a NSO data provider for operational data (config false) written in py
 
 The data provider will try to provide a normalised view of different device types interfaces.
 
-It doesnt work in the current release of NSO (4.6.1) without some small python API changes.
+It doesnt work in the current release of NSO (4.7) without some small python API changes, the changes needed can be found in the application.py in the test folder.
 
 ```
 
